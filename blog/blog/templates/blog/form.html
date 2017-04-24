@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h1>Them moi bai viet</h1>
+    <form method="POST" about="{{ url_for('blog_add') }}">
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="5" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Content</label>
+            <textarea name="content" rows="10" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+{% endblock %}

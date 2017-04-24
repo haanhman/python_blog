@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h1>Danh sach bai viet</h1>
+    {% for item in items %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a href="{{ url_for('blog_detail', post_id=item.id) }}">{{ item.title }}</a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <p class="lead">
+                    {{ item.description }}
+                </p>
+                <div class="timestamp">
+                    {{ item.create_date | datetime }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

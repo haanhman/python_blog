@@ -1,0 +1,2 @@
+graft blog/templates
+graft blog/static

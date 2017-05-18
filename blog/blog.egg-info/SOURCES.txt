@@ -3,6 +3,7 @@ blog/__init__.py
 blog/blog.py
 blog/config.py
 blog/index.py
+blog/mysql.py
 blog.egg-info/PKG-INFO
 blog.egg-info/SOURCES.txt
 blog.egg-info/dependency_links.txt

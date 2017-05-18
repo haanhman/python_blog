@@ -5,4 +5,4 @@ def index_index():
 
 @app.route('/version')
 def index_version():
-    return render_template('index/version.html', version = "1.0.0")
+    return render_template('index/version.html', version = "1.0.1")

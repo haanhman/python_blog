@@ -9,11 +9,18 @@
                 </h3>
             </div>
             <div class="panel-body">
+                <div class="center-block">
+                    <img src="/static/images/{{ item.thumbnail }}" class="img-responsive" alt="{{ item.title }}">
+                </div>
                 <p class="lead">
                     {{ item.description }}
                 </p>
                 <div class="timestamp">
                     {{ item.create_date | datetime }}
+                </div>
+                <div class="func">
+                <a onclick="return confirm('Are you sure?')" href="{{ url_for('blog_delete', post_id=item.id) }}"><span style="color: red" class="glyphicon glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                <a href="{{ url_for('blog_edit', post_id=item.id) }}"><span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span></a>
                 </div>
             </div>
         </div>

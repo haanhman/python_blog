@@ -1,4 +1,5 @@
-from config import app, url_for, render_template, request, redirect, flash
+from flask import session, flash
+from config import app, url_for, render_template, request, redirect
 from mysql import db
 from werkzeug.utils import secure_filename
 import datetime
@@ -9,15 +10,13 @@ import string
 def blog_index():
     db.execute("SELECT * FROM tbl_entries ORDER BY id DESC")
     result = db.fetchall()
+    print("UPLOAD FOLDER: %s" % app.config['UPLOAD_FOLDER'])
     return render_template('blog/index.html', items=result)
 
-def uploadThumbnail(post_id = 0):
+def uploadThumbnail():
     thumb = request.files['thumbnail']
     if thumb.filename == '':
-        if post_id == 0:
-            return redirect(url_for('blog_add'))
-        else:
-            return redirect(url_for('blog_update', post_id=post_id))
+        return None
 
     filename = secure_filename(thumb.filename)
     filename = string.ascii_lowercase + '_' + filename
@@ -30,7 +29,11 @@ def uploadThumbnail(post_id = 0):
 def blog_add():
     if request.method == 'POST':
         print(request.files)
-        thumbnail = uploadThumbnail(0)
+        thumbnail = uploadThumbnail()
+        if thumbnail is None:
+            flash('File not found!', 'error')
+            return redirect(url_for('blog_add'))
+
         db.execute('INSERT INTO tbl_entries (title, description, content, thumbnail, create_date, edit_date) VALUES (%s, %s, %s, %s, %s, %s)', (
             request.form['title'].strip(),
             request.form['description'].strip(),
@@ -39,6 +42,7 @@ def blog_add():
             int(time.time()),
             0
         ))
+        flash('Create new post success')
         return redirect(url_for('blog_index'))
     print('Create new post')
     return render_template('blog/form.html')
@@ -48,7 +52,8 @@ def blog_detail(post_id):
     db.execute("SELECT * FROM tbl_entries WHERE id = " + str(post_id))
     entry = db.fetchone()
     if entry is None:
-        return "Entry not found!"
+        flash('Post not found!', 'error')
+        return redirect(url_for('blog_index'))
     return render_template('blog/detail.html', item = entry)
 
 
@@ -59,7 +64,8 @@ def blog_edit(post_id):
     ))
     entry = db.fetchone();
     if entry is None:
-        return "Entry not found!"
+        flash('Post not found!', 'error')
+        return redirect(url_for('blog_index'))
     return render_template('blog/form.html', item = entry)
 
 
@@ -68,7 +74,8 @@ def blog_update(post_id):
     db.execute("SELECT * FROM tbl_entries WHERE id = " + str(post_id))
     entry = db.fetchone()
     if entry is None:
-        return "Entry not found!"
+        flash('Post not found!', 'error')
+        return redirect(url_for('blog_index'))
 
     thumbnail = entry['thumbnail']
     thumb = request.files['thumbnail']
@@ -77,8 +84,8 @@ def blog_update(post_id):
         oldThumbnail = app.config['UPLOAD_FOLDER'] + '/' + thumbnail
         if os.path.exists(oldThumbnail):
             os.remove(oldThumbnail)
-            
-        thumbnail = uploadThumbnail(0)
+
+        thumbnail = uploadThumbnail()
     db.execute('UPDATE tbl_entries SET thumbnail = %s, title = %s, description = %s, content = %s, edit_date = %s WHERE id = %s', (
             thumbnail,
             request.form['title'].strip(),
@@ -87,6 +94,7 @@ def blog_update(post_id):
             int(time.time()),
             post_id
         ))
+    flash('Update post success')
     return redirect(url_for('blog_detail', post_id=post_id))
 
 @app.route('/blog/delete/<int:post_id>')
